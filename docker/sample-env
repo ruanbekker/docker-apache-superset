@@ -1,0 +1,35 @@
+# project name
+COMPOSE_PROJECT_NAME=docker-superset
+
+# database configurations 
+DATABASE_DB=superset
+DATABASE_HOST=postgres
+DATABASE_PASSWORD=superset
+DATABASE_USER=superset
+
+# database engine specific environment variables
+DATABASE_PORT=5432
+DATABASE_DIALECT=postgresql
+POSTGRES_DB=superset
+POSTGRES_USER=superset
+POSTGRES_PASSWORD=superset
+
+# SMTP
+SMTP_HOST=__SUPERSET_SMTP_HOST__
+SMTP_STARTTLS=True
+SMTP_SSL=True
+SMTP_USER=__SUPERSET_SMTP_USER__
+SMTP_PORT=__SUPERSET_SMTP_PORT__
+SMTP_PASSWORD=__SUPERSET_SMTP_PASSWORD__
+SMTP_MAIL_FROM=__SUPERSET_SMTP_MAILFROM__
+
+# override config path in /app/pythonpath_docker
+PYTHONPATH=/app/pythonpath:/app/docker/pythonpath_dev
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+FLASK_ENV=production
+SUPERSET_ENV=production
+SUPERSET_LOAD_EXAMPLES=no
+CYPRESS_CONFIG=false
+SUPERSET_PORT=8088
