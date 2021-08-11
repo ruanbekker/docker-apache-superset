@@ -1,0 +1,38 @@
+# https://taskfile.dev
+# install:
+# - mac:   brew install go-task/tap/go-task
+# - linux: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
+version: '3'
+
+tasks:
+  default:
+    desc: runs by default and calls the help task
+    deps: [help]
+    silent: true
+
+  help:
+    desc: prints out the help context
+    cmds:
+      - task --list
+    silent: true
+
+  build:
+    desc: builds the containers specified in the docker-compose.yml
+    cmds:
+      - docker-compose build
+
+  deploy:
+    desc: deploys the containers from docker-compose.yml
+    cmds:
+      - docker-compose up --build -d
+
+  destroy:
+    desc: stops containers from docker-compose.yml
+    cmds:
+      - docker-compose down
+
+  backup:
+    desc: backup the project directory
+    cmds:
+      - tar -zcvf $PWD/docker-apache-superset-$(date +%F).tar.gz $PWD/docker-compose.yml $PWD/docker $PWD/superset_home $PWD/redis $PWD/postgres
