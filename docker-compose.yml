@@ -14,6 +14,22 @@ services:
       options:
         max-size: "1m"
 
+  postgres:
+    image: postgres:10.4
+    container_name: superset-database
+    environment:
+      - POSTGRES_USER=superset
+      - POSTGRES_PASSWORD=superset
+      - POSTGRES_DB=superset
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    networks:
+      - superset
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
   superset:
     build:
       context: .
