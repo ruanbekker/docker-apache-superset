@@ -2,13 +2,18 @@ version: "3.7"
 
 services:
   redis:
-    image: redis:latest
+    image: redis:6.0
     container_name: superset-cache
     restart: unless-stopped
     volumes:
       - ./redis:/data
     networks:
       - superset
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
     logging:
       driver: "json-file"
       options:
@@ -25,6 +30,10 @@ services:
       - ./postgres:/var/lib/postgresql/data
     networks:
       - superset
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 5
     logging:
       driver: "json-file"
       options:
@@ -42,7 +51,10 @@ services:
     ports:
       - 8085:8088
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     volumes:
       - ./docker:/app/docker
       - ./superset_home:/app/superset_home
@@ -61,7 +73,10 @@ services:
     command: ["/app/docker/docker-init.sh"]
     env_file: docker/.env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     user: "root"
     volumes:
       - ./docker:/app/docker
@@ -82,7 +97,10 @@ services:
     env_file: docker/.env
     restart: unless-stopped
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     user: "root"
     volumes:
       - ./docker:/app/docker
@@ -103,7 +121,10 @@ services:
     env_file: docker/.env
     restart: unless-stopped
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     user: "root"
     volumes:
       - ./docker:/app/docker
