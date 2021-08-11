@@ -1,0 +1,104 @@
+version: "3.7"
+
+services:
+  redis:
+    image: redis:latest
+    container_name: superset-cache
+    restart: unless-stopped
+    volumes:
+      - ./redis:/data
+    networks:
+      - superset
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
+  superset:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: superset-app
+    command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
+    env_file: docker/.env
+    user: "root"
+    restart: unless-stopped
+    ports:
+      - 8085:8088
+    depends_on:
+      - redis
+    volumes:
+      - ./docker:/app/docker
+      - ./superset_home:/app/superset_home
+    networks:
+      - superset
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
+  superset-init:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: superset-init
+    command: ["/app/docker/docker-init.sh"]
+    env_file: docker/.env
+    depends_on:
+      - redis
+    user: "root"
+    volumes:
+      - ./docker:/app/docker
+      - ./superset_home:/app/superset_home
+    networks:
+      - superset
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
+  superset-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: superset-worker
+    command: ["/app/docker/docker-bootstrap.sh", "worker"]
+    env_file: docker/.env
+    restart: unless-stopped
+    depends_on:
+      - redis
+    user: "root"
+    volumes:
+      - ./docker:/app/docker
+      - ./superset_home:/app/superset_home
+    networks:
+      - superset
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
+  superset-worker-beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: superset-worker-beat
+    command: ["/app/docker/docker-bootstrap.sh", "beat"]
+    env_file: docker/.env
+    restart: unless-stopped
+    depends_on:
+      - redis
+    user: "root"
+    volumes:
+      - ./docker:/app/docker
+      - ./superset_home:/app/superset_home
+    networks:
+      - superset
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+
+networks:
+  superset:
+    name: superset
